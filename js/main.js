@@ -209,7 +209,7 @@ function goHome(e) {
   const home = document.getElementById("home-view");
   const detail = document.getElementById("detail-view");
 
-  if (detail && !detail.hidden) {
+   if (detail && !detail.hidden) {
     history.back();
     return;
   }
@@ -320,7 +320,9 @@ function openProgram(id) {
     `;
   }
 
-  history.pushState({ view: 'detail', id: p.id }, '', '#' + p.id);
+   if (!history.state || history.state.view !== 'detail' || history.state.id !== id) {
+    history.pushState({ view: 'detail', id: p.id }, '', '#' + p.id);
+  }
 
   // Mostrar vista detalle
   home.hidden = true;
@@ -532,6 +534,9 @@ document.addEventListener("DOMContentLoaded", () => {
   initReveal();
   const y = document.getElementById("year");
   if (y) y.textContent = new Date().getFullYear();
+   if (!history.state || history.state.view !== 'home') {
+    history.replaceState({ view: 'home' }, '', window.location.pathname);
+  }
 });
 
 window.addEventListener('popstate', (e) => {
@@ -541,18 +546,19 @@ window.addEventListener('popstate', (e) => {
 
   const state = e.state;
 
-  if (state && state.view === 'detail') {
-    // El usuario volvió a un estado de detalle (caso raro, pero cubierto)
+  if (state && state.view === 'detail' && state.id) {
+    // Volvió a un estado de detalle → abrir esa card
     openProgram(state.id);
   } else {
-    // Volvió a la home → ocultar detalle, mostrar home
+    // state es null o es home → mostrar home
     detail.hidden = true;
     home.hidden = false;
     closeDonationModal();
     closeDownloadModal();
-    // Limpiar el hash de la URL sin recargar
+    // Limpiar hash sin recargar
     if (window.location.hash) {
-      history.replaceState(null, '', window.location.pathname);
+      history.replaceState({ view: 'home' }, '', window.location.pathname);
     }
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 });

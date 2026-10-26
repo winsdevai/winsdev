@@ -1097,6 +1097,30 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
   .download-emoji { font-size: 2.2rem; }
 }
 
+/* ---------- Móvil: botón Volver flotante ---------- */
+@media (max-width: 720px) {
+  .back-btn {
+    position: fixed !important;
+    right: 22px;
+    bottom: 60px;
+    top: auto !important;
+    
+    z-index: 90;
+  }
+
+  /* Mover el botón de WhatsApp un poco para que no choque */
+  .wa-float {
+    bottom: 16px;
+    right: 16px;
+    z-index: 80;             /* menor que el back-btn */
+  }
+
+  /* Darle aire al contenido para que no quede tapado */
+  .detail-view {
+    padding-bottom: 120px;
+  }
+}
+
 /* ---------- WhatsApp floating ---------- */
 .wa-float {
   position: fixed;
