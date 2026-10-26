@@ -691,7 +691,13 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
     var(--bg);
   min-height: 80vh;
 }
-.back-btn { margin-bottom: 22px; }
+.back-btn {
+  position: sticky;
+  top: 84px;       
+  z-index: 40;
+  margin-bottom: 22px;
+  align-self: flex-start;  
+}
 .detail-card {
   display: grid;
   grid-template-columns: 1fr 1.1fr;

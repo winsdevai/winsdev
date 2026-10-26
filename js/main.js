@@ -203,16 +203,20 @@ function renderStore() {
    ---------------------------------------------------------- */
 
 function goHome(e) {
-  // Si el click viene de un <a href="#algo">, scrolleamos a esa sección
   const hash = e?.currentTarget?.getAttribute?.("href") || "";
   if (e) e.preventDefault();
+
   const home = document.getElementById("home-view");
   const detail = document.getElementById("detail-view");
-  if (detail) detail.hidden = true;
-  if (home) home.hidden = false;
-  closeDonationModal();
 
-  // Esperar a que la home esté visible antes de hacer scroll
+  if (detail && !detail.hidden) {
+    history.back();
+    return;
+  }
+
+  closeDonationModal();
+  closeDownloadModal();
+
   requestAnimationFrame(() => {
     if (hash && hash.startsWith("#") && hash.length > 1) {
       const target = document.querySelector(hash);
@@ -315,6 +319,8 @@ function openProgram(id) {
       Usar en la web
     `;
   }
+
+  history.pushState({ view: 'detail', id: p.id }, '', '#' + p.id);
 
   // Mostrar vista detalle
   home.hidden = true;
@@ -521,12 +527,32 @@ function initReveal() {
   els.forEach((el) => io.observe(el));
 }
 
-/* ----------------------------------------------------------
-   7. INIT
-   ---------------------------------------------------------- */
 document.addEventListener("DOMContentLoaded", () => {
   renderStore();
   initReveal();
   const y = document.getElementById("year");
   if (y) y.textContent = new Date().getFullYear();
+});
+
+window.addEventListener('popstate', (e) => {
+  const home = document.getElementById("home-view");
+  const detail = document.getElementById("detail-view");
+  if (!home || !detail) return;
+
+  const state = e.state;
+
+  if (state && state.view === 'detail') {
+    // El usuario volvió a un estado de detalle (caso raro, pero cubierto)
+    openProgram(state.id);
+  } else {
+    // Volvió a la home → ocultar detalle, mostrar home
+    detail.hidden = true;
+    home.hidden = false;
+    closeDonationModal();
+    closeDownloadModal();
+    // Limpiar el hash de la URL sin recargar
+    if (window.location.hash) {
+      history.replaceState(null, '', window.location.pathname);
+    }
+  }
 });
